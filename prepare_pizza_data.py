@@ -119,3 +119,16 @@ test_text = 'pizza/data/test_pizza/text'
 train_text = 'pizza/data/train_pizza/text'
 make_utt2spk(test_text, 'pizza/data/test_pizza/utt2spk')
 make_utt2spk(train_text, 'pizza/data/train_pizza/utt2spk')
+
+# make spk2utt files using kaldi util
+test_utt2spk_file = 'pizza/data/test_pizza/utt2spk'
+test_spk2utt_file = 'pizza/data/test_pizza/spk2utt'
+test_args = "{}/egs/wsj/s5/utils/utt2spk_to_spk2utt.pl {} > {}".format(
+            KALDI_PATH, test_utt2spk_file, test_spk2utt_file)
+call(test_args, shell=True)
+
+train_utt2spk_file = 'pizza/data/train_pizza/utt2spk'
+train_spk2utt_file = 'pizza/data/train_pizza/spk2utt'
+train_args = "{}/egs/wsj/s5/utils/utt2spk_to_spk2utt.pl {} > {}".format(
+            KALDI_PATH, train_utt2spk_file, train_spk2utt_file)
+call(train_args, shell=True)
