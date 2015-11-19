@@ -66,6 +66,6 @@ non_silence_phones()
 
 # use kaldi util to generate the rest of the files
 util_arg = ('{}/egs/wsj/s5/utils/prepare_lang.sh data/local/dict "<UNK> "' +
-             'data/local/lang data/lang')
+             'data/local/lang data/lang').format(KALDI_PATH)
 call(util_arg, shell=True)
             
