@@ -18,6 +18,9 @@ Directory format:
         |---test_pizza_audio # test .wav files
         |---train_pizza_audio # train .wav files
         |---data
+            |---lang
+            |---local
+            |   |---dict
             |---test_pizza
             |   |---text
             |   |---utt2spk

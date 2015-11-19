@@ -26,6 +26,12 @@ def make_dir_structure(data_dir):
         os.chdir('data')
         os.mkdir('test_pizza')
         os.mkdir('train_pizza')
+        os.mkdir('lang')
+        os.mkdir('local')
+        os.chdir('local')
+        os.mkdir('dict')
+        os.mkdir('lang')
+        os.chdir('..')
 
         # Copy data from data_for_pa3 to pizza directory
         os.chdir('..') # cd up to pizza dir
