@@ -53,7 +53,7 @@ data_dir = abspath(sys.argv[1]) # path to data_for_pa3
 
 # make silence phone files
 call('echo "SIL" > pizza/data/local/dict/silence_phones.txt', shell=True)
-call('echo "SIL" > pizza/data/local/dict/optional_silence_phones.txt', shell=True)
+call('echo "SIL" > pizza/data/local/dict/optional_silence.txt', shell=True)
 
 # make empty 'extra_questions.txt'
 call("touch pizza/data/local/dict/extra_questions.txt", shell=True)
@@ -65,6 +65,7 @@ lexicon('pizza/data/train_pizza/text')
 non_silence_phones()
 
 # use kaldi util to generate the rest of the files
+os.chdir('pizza')
 util_arg = ('{}/egs/wsj/s5/utils/prepare_lang.sh data/local/dict "<UNK> "' +
              'data/local/lang data/lang').format(KALDI_PATH)
 call(util_arg, shell=True)

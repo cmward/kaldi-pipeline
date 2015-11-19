@@ -45,6 +45,9 @@ def make_dir_structure(data_dir):
             shutil.copy(
                     audio_file,
                     abspath('train_pizza_audio')+'/'+basename(audio_file))
+        # Copy kaldi utils to pizza dir
+        shutil.copy('../steps', 'steps')
+        shutil.copy('../utils', 'utils')
     except OSError: # Directory structure has already been created
         print "Pizza directory has already been created."
 
