@@ -7,14 +7,11 @@ from os.path import abspath, basename
 """Script to create the directory structure for the pizza data.
 Copies the audio files.
 
-Usage:
-    python make_pizza_dir.py /path/to/data_for_pa3
-
 Call this from kaldi-pipeline directory.
 """
 
 def make_dir_structure(data_dir):
-    """Call this kaldi-pipeline directory. Makes the pizza directory.
+    """Call this from kaldi-pipeline directory. Makes the pizza directory.
     Input is path to data_for_pa3 folder."""
     data_dir = abspath(data_dir)
     try:
@@ -51,6 +48,6 @@ def make_dir_structure(data_dir):
     except OSError: # Directory structure has already been created
         print "Pizza directory has already been created."
 
-
-data_dir = abspath(sys.argv[1])
-make_dir_structure(data_dir)
+def main(data_dir):
+    data_dir = abspath(data_dir)
+    make_dir_structure(data_dir)

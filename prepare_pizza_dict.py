@@ -10,9 +10,6 @@ from nltk.corpus import cmudict
 Run this from kaldi-pipeline.
 
 Assumes make_pizza_dir and prepare_pizza_data have been run.
-
-Usage:
-    python prepare_pizza_dict.py /path/to/data_for_pa3
 """
 
 KALDI_PATH = os.environ['KALDI']
@@ -49,24 +46,19 @@ def non_silence_phones():
             for phone in phone_set:
                 nsp.write(phone+'\n')
 
-data_dir = abspath(sys.argv[1]) # path to data_for_pa3
+def main(data_dir):
+    data_dir = abspath(data_dir) # path to data_for_pa3
 
-# make silence phone files
-call('echo "SIL" > pizza/data/local/dict/silence_phones.txt', shell=True)
-call('echo "SIL" > pizza/data/local/dict/optional_silence.txt', shell=True)
+    # make silence phone files
+    call('echo "SIL" > pizza/data/local/dict/silence_phones.txt', shell=True)
+    call('echo "SIL" > pizza/data/local/dict/optional_silence.txt', shell=True)
 
-# make empty 'extra_questions.txt'
-call("touch pizza/data/local/dict/extra_questions.txt", shell=True)
+    # make empty 'extra_questions.txt'
+    call("touch pizza/data/local/dict/extra_questions.txt", shell=True)
 
-# make the lexicon
-lexicon('pizza/data/train_pizza/text')
+    # make the lexicon
+    lexicon('pizza/data/train_pizza/text')
 
-# make phone list
-non_silence_phones()
+    # make phone list
+    non_silence_phones()
 
-# use kaldi util to generate the rest of the files
-os.chdir('pizza')
-util_arg = ('{}/egs/wsj/s5/utils/prepare_lang.sh data/local/dict "<UNK> "' +
-             'data/local/lang data/lang').format(KALDI_PATH)
-call(util_arg, shell=True)
-            
