@@ -5,6 +5,8 @@ import os
 import shutil
 from subprocess import call, check_output
 from os.path import splitext, abspath, basename
+from os.path import join as pjoin
+from path import *
 
 """Script to prepare the pizza order data for Kaldi.
 
@@ -101,11 +103,8 @@ def make_utt2spk(text_file, utt2spk_file):
                 spk_id, _ = utt_id.split('-')
                 utt2spk_line = "{} {}".format(utt_id, spk_id)
                 utt2spk.write(utt2spk_line + '\n')
-            utt2spk.write('\n')
                 
 def main(data_dir):
-    ### SORT THESE FILES
-
     # downscale audio to 8k
     audio_files = (glob.glob('pizza/test_pizza_audio/*.wav') +
                    glob.glob('pizza/train_pizza_audio/*.wav'))
@@ -113,34 +112,37 @@ def main(data_dir):
         downscale(audio_file)
 
     # make text files
-    test_transcript = data_dir + '/devtest/transcript/pizza_devtest'
-    train_transcript = data_dir + '/train/transcript/pizza_train'
-    make_text(test_transcript, 'pizza/data/test_pizza/text')
-    make_text(train_transcript, 'pizza/data/train_pizza/text')
+    test_transcript = pjoin(data_dir, 'devtest/transcript/pizza_devtest')
+    train_transcript = pjoin(data_dir, 'train/transcript/pizza_train')
+    make_text(test_transcript, pjoin(PIZZA_DATA_TE, 'text'))
+    make_text(train_transcript, pjoin(PIZZA_DATA_TR, 'text'))
 
     # make scp files
-    test_audio_dir = 'pizza/test_pizza_audio'
-    train_audio_dir = 'pizza/train_pizza_audio'
-    make_scp(test_audio_dir, 'pizza/data/test_pizza/wav.scp')
-    make_scp(train_audio_dir, 'pizza/data/train_pizza/wav.scp')
+    make_scp(PIZZA_WAV_TE, pjoin(PIZZA_DATA_TE, 'wav.scp'))
+    make_scp(PIZZA_WAV_TR, pjoin(PIZZA_DATA_TR, 'wav.scp'))
 
     # make utt2spk files
-    test_text = 'pizza/data/test_pizza/text'
-    train_text = 'pizza/data/train_pizza/text'
-    make_utt2spk(test_text, 'pizza/data/test_pizza/utt2spk')
-    make_utt2spk(train_text, 'pizza/data/train_pizza/utt2spk')
+    test_text = pjoin(PIZZA_DATA_TE, 'text')
+    train_text = pjoin(PIZZA_DATA_TR, 'text')
+    make_utt2spk(test_text, pjoin(PIZZA_DATA_TE, 'utt2spk'))
+    make_utt2spk(train_text, pjoin(PIZZA_DATA_TR, 'utt2spk'))
 
     # make spk2utt files using kaldi util
-    test_utt2spk_file = 'pizza/data/test_pizza/utt2spk'
-    test_spk2utt_file = 'pizza/data/test_pizza/spk2utt'
-    test_args = "{}/egs/wsj/s5/utils/utt2spk_to_spk2utt.pl {} > {}".format(
-                KALDI_PATH, test_utt2spk_file, test_spk2utt_file)
+    test_utt2spk_file = pjoin(PIZZA_DATA_TE, 'utt2spk')
+    test_spk2utt_file = pjoin(PIZZA_DATA_TE, 'spk2utt')
+    test_args = "{} {} > {}".format(
+        pjoin(PIZZA_DIR,'utils','utt2spk_to_spk2utt.pl'),
+        test_utt2spk_file, test_spk2utt_file)
     call(test_args, shell=True)
 
-    train_utt2spk_file = 'pizza/data/train_pizza/utt2spk'
-    train_spk2utt_file = 'pizza/data/train_pizza/spk2utt'
-    train_args = "{}/egs/wsj/s5/utils/utt2spk_to_spk2utt.pl {} > {}".format(
-                KALDI_PATH, train_utt2spk_file, train_spk2utt_file)
+    train_utt2spk_file = pjoin(PIZZA_DATA_TR, 'utt2spk')
+    train_spk2utt_file = pjoin(PIZZA_DATA_TR, 'spk2utt')
+    train_args = "{} {} > {}".format(
+        pjoin(PIZZA_DIR,'utils','utt2spk_to_spk2utt.pl'),
+        train_utt2spk_file, train_spk2utt_file)
     call(train_args, shell=True)
 
-
+    #Sort files
+    files = glob.glob(PIZZA_DATA_TE+'/*') + glob.glob(PIZZA_DATA_TR+'/*')
+    for file in files:
+        call("sort {} -o {}".format(file, file),shell=True)
