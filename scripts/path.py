@@ -1,7 +1,7 @@
 import os
 from os.path import join as pjoin
 
-PROJECT_ROOT = os.path.join('..' ,os.curdir)
+PROJECT_ROOT = os.path.join(os.curdir)
 PIZZA_DIR = pjoin(PROJECT_ROOT, 'pizza')
 PIZZA_WAV_TR = pjoin(PIZZA_DIR, 'train_pizza_audio')
 PIZZA_WAV_TE = pjoin(PIZZA_DIR, 'test_pizza_audio')
