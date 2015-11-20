@@ -7,6 +7,7 @@ fi
 export PATH=$(pwd)/utils/:\
 $KALDI/src/bin:\
 $KALDI/tools/openfst/bin:\
+$KALDI/tools/sph2pipe_v2.5/sph2pipe:\
 $KALDI/src/fstbin/:\
 $KALDI/src/gmmbin/:\
 $KALDI/src/featbin/:\
