@@ -51,6 +51,58 @@ def non_silence_phones():
             for phone in phone_set:
                 nsp.write(phone+'\n')
 
+            """
+            # Group phones with the same basephone on the same line,
+            # e.g., AA AA0 AA1. 
+            # This causes a fatal error in the dict creation process.
+            for line in lexicon:
+                split_line = line.split()[1:] # just get phones
+                for phone in split_line:
+                    if phone not in phone_set:
+                        phone_set.add(phone)
+            phones = [split(phone) for phone in phone_set]
+            pdict = {}
+            for phone in phones:
+                if not phone[0] in pdict:
+                    pdict[phone[0]] = set(phone[0])
+                    pdict[phone[0]].add(''.join(str(x) for x in phone))
+                else:
+                    pdict[phone[0]].add(''.join(str(x) for x in phone))
+            for k,v in pdict.iteritems():
+                for phone in v:
+                    nsp.write(' '+phone)
+                nsp.write('\n')
+            """
+
+def main(data_dir):
+    data_dir = abspath(data_dir) # path to data_for_pa3
+
+    # make silence phone files
+    silence_phones = pjoin(PIZZA_LCL_DICT, 'silence_phones.txt')
+    optional_silence = pjoin(PIZZA_LCL_DICT, 'optional_silence.txt')
+    call('echo "SIL" > {}'.format(silence_phones), shell=True)
+    call('echo "SIL" > {}'.format(optional_silence), shell=True)
+
+    # make empty 'extra_questions.txt'
+    call("touch {}".format(pjoin(PIZZA_LCL_DICT,'extra_questions.txt')),
+         shell=True)
+
+    # make the lexicon
+    lexicon(pjoin(PIZZA_DATA_TR,'text'))
+
+    # make phone list
+    non_silence_phones()
+
+    #Sort files
+    files = glob.glob(PIZZA_LCL_DICT+'/*')
+    for file in files:
+        call("sort {} -o {}".format(file, file),shell=True)
+
+    # use kaldi util to generate the rest of the files
+    util_arg = 'utils/prepare_lang.sh {} "<UNK>" {} {}'.format(
+                    PIZZA_LCL_DICT, PIZZA_LCL_LANG, PIZZA_LANG)
+    call(util_arg, shell=True)
+
 def main(data_dir):
     data_dir = abspath(data_dir) # path to data_for_pa3
 
