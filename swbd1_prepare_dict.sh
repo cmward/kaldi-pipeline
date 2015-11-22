@@ -44,7 +44,7 @@ cp local/MSU_single_letter.txt $dir/
 # The original swbd lexicon does not have precise single letter lexicion
 # e.g. it does not have entry of W
 ( echo '!sil sil'; echo '[vocalized-noise] spn'; echo '[noise] nsn'; \
-  echo '[laughter] lau'; echo '<unk> spn' ) \
+  echo '[laughter] lau'; echo '<UNK> spn' ) \
   | cat - $dir/lexicon1.txt $dir/MSU_single_letter.txt  > $dir/lexicon2.txt || exit 1;
 
 # Map the words in the lexicon.  That is-- for each word in the lexicon, we map it

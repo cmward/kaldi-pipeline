@@ -43,7 +43,7 @@ sph2pipe=$KALDI_ROOT/tools/sph2pipe_v2.5/sph2pipe
 
 
 # Trans directory check
-if [ ! -d $SWBD_DIR/transcript/swbd_train]; then
+if [ ! -d $SWBD_DIR/transcript/swbd_train ]; then
   ( 
     cd $dir;
     if [ ! -d swb_ms98_transcriptions ]; then

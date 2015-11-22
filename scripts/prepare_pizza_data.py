@@ -34,13 +34,15 @@ Directory format:
             |   |---utt2spk
             |   |---spk2utt
             |   |---wav.scp
+	    |	|---reco2file_and_channel
+	    |	|---segments
             |---train_pizza
                 |---text
                 |---utt2spk
                 |---spk2utt
                 |---wav.scp
-
-NOTE: test_pizza_audio and train_pizza_audio are ignored by github.
+		|---reco2file_and_channel
+		|---segments
 """
 
 KALDI_PATH = os.environ['KALDI']
@@ -79,7 +81,7 @@ def make_text(transcript, text_file):
                     else:
                         speaker_id = utt_id.strip('1234567890')
                 prefix = speaker_id + "-" + utt_id
-                out_line = prefix + " " + " ".join(split_line[:-1]).upper()
+                out_line = prefix + " " + " ".join(split_line[:-1]).lower()
                 text_out.write(out_line + '\n')
 
 def make_scp(audio_dir, scp_file):
@@ -91,6 +93,30 @@ def make_scp(audio_dir, scp_file):
             scp_line = "{} {}/{}.wav".format(
                 rec_id, abspath(audio_dir), rec_id)
             scp_file.write(scp_line + '\n')
+
+def make_reco2file(audio_dir, reco2file):
+    """Make the reco2file_and_channel file
+    map recording-id filename recording side"""
+    with open(reco2file, 'w+') as reco2file:
+        for audio_file in glob.glob(audio_dir+"/*.wav"):
+            rec_id = basename(audio_file).split('.')[0]
+            reco_line = "{} {} {}".format(rec_id, rec_id, "A")
+            reco2file.write(reco_line + '\n')
+
+def make_segments(audio_dir, seg_file):
+    """Make segments file, utterance-id = same as text/utt2spk file
+    use sox to get end time information (utt-id rec-id utterance start,end"""
+    with open(seg_file, 'w+') as seg_file:
+        for audio_file in glob.glob(audio_dir+"/*.wav"):
+            rec_id = basename(audio_file).split('.')[0]
+            if rec_id.isdigit():
+                utt_id = "{}-{}".format("speaker", rec_id)
+            else:
+                utt_id = rec_id
+            end_cmd = "sox --i -D {}".format(audio_file).strip()
+            end_time = check_output(end_cmd, shell=True)
+            seg_line = "{} {} 0.00 {}".format(utt_id, rec_id, end_time).strip()
+            seg_file.write(seg_line + '\n')
 
 def make_utt2spk(text_file, utt2spk_file):
     """Create spk2utt files mapping speaker ids to utt-ids.
@@ -120,6 +146,14 @@ def main(data_dir):
     # make scp files
     make_scp(PIZZA_WAV_TE, pjoin(PIZZA_DATA_TE, 'wav.scp'))
     make_scp(PIZZA_WAV_TR, pjoin(PIZZA_DATA_TR, 'wav.scp'))
+
+    #make reco2file_and_channel files
+    make_reco2file(PIZZA_WAV_TE, pjoin(PIZZA_DATA_TE, 'reco2file_and_channel'))
+    make_reco2file(PIZZA_WAV_TR, pjoin(PIZZA_DATA_TR, 'reco2file_and_channel'))
+
+    #make segment files
+    make_segments(PIZZA_WAV_TE, pjoin(PIZZA_DATA_TE, 'segments'))
+    make_segments(PIZZA_WAV_TR, pjoin(PIZZA_DATA_TR, 'segments'))
 
     # make utt2spk files
     test_text = pjoin(PIZZA_DATA_TE, 'text')

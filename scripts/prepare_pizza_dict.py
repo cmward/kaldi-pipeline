@@ -80,37 +80,8 @@ def main(data_dir):
     # make silence phone files
     silence_phones = pjoin(PIZZA_LCL_DICT, 'silence_phones.txt')
     optional_silence = pjoin(PIZZA_LCL_DICT, 'optional_silence.txt')
-    call('echo "SIL" > {}'.format(silence_phones), shell=True)
-    call('echo "SIL" > {}'.format(optional_silence), shell=True)
-
-    # make empty 'extra_questions.txt'
-    call("touch {}".format(pjoin(PIZZA_LCL_DICT,'extra_questions.txt')),
-         shell=True)
-
-    # make the lexicon
-    lexicon(pjoin(PIZZA_DATA_TR,'text'))
-
-    # make phone list
-    non_silence_phones()
-
-    #Sort files
-    files = glob.glob(PIZZA_LCL_DICT+'/*')
-    for file in files:
-        call("sort {} -o {}".format(file, file),shell=True)
-
-    # use kaldi util to generate the rest of the files
-    util_arg = 'utils/prepare_lang.sh {} "<UNK>" {} {}'.format(
-                    PIZZA_LCL_DICT, PIZZA_LCL_LANG, PIZZA_LANG)
-    call(util_arg, shell=True)
-
-def main(data_dir):
-    data_dir = abspath(data_dir) # path to data_for_pa3
-
-    # make silence phone files
-    silence_phones = pjoin(PIZZA_LCL_DICT, 'silence_phones.txt')
-    optional_silence = pjoin(PIZZA_LCL_DICT, 'optional_silence.txt')
-    call('echo "SIL" > {}'.format(silence_phones), shell=True)
-    call('echo "SIL" > {}'.format(optional_silence), shell=True)
+    call('echo "sil" > {}'.format(silence_phones), shell=True)
+    call('echo "sil" > {}'.format(optional_silence), shell=True)
 
     # make empty 'extra_questions.txt'
     call("touch {}".format(pjoin(PIZZA_LCL_DICT,'extra_questions.txt')),

@@ -157,3 +157,6 @@ done
 
 echo Switchboard-1 data preparation succeeded.
 utils/fix_data_dir.sh data/train
+
+utils/prepare_lang.sh data/local/dict_nosp "<UNK>" data/local/lang_nosp data/lang_nosp
+echo Done preparing lang
