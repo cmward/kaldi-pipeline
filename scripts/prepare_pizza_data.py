@@ -109,10 +109,12 @@ def make_segments(audio_dir, seg_file):
     with open(seg_file, 'w+') as seg_file:
         for audio_file in glob.glob(audio_dir+"/*.wav"):
             rec_id = basename(audio_file).split('.')[0]
-            if rec_id.isdigit():
-                utt_id = "{}-{}".format("speaker", rec_id)
-            else:
-                utt_id = rec_id
+            if "_" not in rec_id:
+                if rec_id.isdigit():
+                    speaker_id = "speaker"
+                else:
+                    speaker_id = rec_id.strip('1234567890')
+            utt_id = "{}-{}".format(speaker_id, rec_id)
             end_cmd = "sox --i -D {}".format(audio_file).strip()
             end_time = check_output(end_cmd, shell=True)
             seg_line = "{} {} 0.00 {}".format(utt_id, rec_id, end_time).strip()
