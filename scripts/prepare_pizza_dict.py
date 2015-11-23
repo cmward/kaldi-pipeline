@@ -46,7 +46,7 @@ def non_silence_phones():
             for line in lexicon:
                 split_line = line.split()[1:] # just get phones
                 for phone in split_line:
-                    if phone not in phone_set:
+                    if phone not in phone_set and not phone == 'spn':
                         phone_set.add(phone)
             for phone in phone_set:
                 nsp.write(phone+'\n')
@@ -80,7 +80,7 @@ def main(data_dir):
     # make silence phone files
     silence_phones = pjoin(PIZZA_LCL_DICT, 'silence_phones.txt')
     optional_silence = pjoin(PIZZA_LCL_DICT, 'optional_silence.txt')
-    call('echo "sil" > {}'.format(silence_phones), shell=True)
+    call('echo "sil\nspn" > {}'.format(silence_phones), shell=True)
     call('echo "sil" > {}'.format(optional_silence), shell=True)
 
     # make empty 'extra_questions.txt'

@@ -18,7 +18,7 @@ def merge_files(dir1, dir2):
     to_merge = [(file1, file2) for file1 in dir1 for file2 in dir2
                 if basename(file1) == basename(file2)]
     for files in to_merge:
-        merge_args = "cat {} >> {} | sort -u -o {} {}".format(
+        merge_args = "cat {} >> {} | sort -u {} -o {}".format(
                         files[1], files[0], files[0], files[0])
         call(merge_args, shell=True)
 
@@ -50,7 +50,7 @@ def main(data_dir):
     print "\nPreparing combined lang\n"
     call("rm {}".format(pjoin(LCL_LANG, "*")), shell=True)
     call("rm {}".format(pjoin(LCL_DICT, "lexiconp.txt")), shell=True)
-    util_arg = 'utils/prepare_lang.sh {} "<unk>" {} {}'.format(
+    util_arg = 'utils/prepare_lang.sh {} "<UNK>" {} {}'.format(
                     LCL_DICT, LCL_LANG, LANG)
     call(util_arg, shell=True)
 
