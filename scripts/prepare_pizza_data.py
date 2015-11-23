@@ -109,6 +109,7 @@ def make_segments(audio_dir, seg_file):
     with open(seg_file, 'w+') as seg_file:
         for audio_file in glob.glob(audio_dir+"/*.wav"):
             rec_id = basename(audio_file).split('.')[0]
+            speaker_id = rec_id.split('_')[0]
             if "_" not in rec_id:
                 if rec_id.isdigit():
                     speaker_id = "speaker"
