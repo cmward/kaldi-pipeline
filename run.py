@@ -18,7 +18,6 @@ def merge_files(dir1, dir2):
     to_merge = [(file1, file2) for file1 in dir1 for file2 in dir2
                 if basename(file1) == basename(file2)]
     for files in to_merge:
-        print files
         merge_args = "cat {} >> {} | sort -u -o {} {}".format(
                         files[1], files[0], files[0], files[0])
         call(merge_args, shell=True)
