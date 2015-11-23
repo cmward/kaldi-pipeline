@@ -28,11 +28,11 @@ def lexicon(train_text):
                         try:
                             prons = pron_dict[word]
                             for pron in prons:
-                                lexicon.write(word + ' ' + ' '.join(pron) + '\n')
+                                lexicon.write(word + ' ' + ' '.join(pron).lower() + '\n')
                         except KeyError:
                             pass #word not in cmudict
                         words_seen.add(word)
-        lexicon.write('<UNK> SPN\n')
+        lexicon.write('<UNK> spn\n')
 
 def non_silence_phones():
     """Create nonsilence_phones, a list of 'real' phones.
