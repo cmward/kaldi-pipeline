@@ -112,13 +112,22 @@ python local/map_acronyms_transcripts.py -i $dir/text -o $dir/text_map \
   -M data/local/dict_nosp/acronyms.map 
 mv $dir/text_map $dir/text
 
+awk '{
+		spk=substr($1,4,6);
+		utt=$1;
+		$1=spk "-" utt;
+		print $0
+}' < $dir/text >  $dir/text2
+
+mv $dir/text2 $dir/text
+
 # (1c) Make segment files from transcript
 #segments file format is: utt-id side-id start-time end-time, e.g.:
 #sw02001-A_000098-001156 sw02001-A 0.98 11.56
 awk '{ 
        segment=$1;
        split(segment,S,"[_-]");
-       side=S[2]; audioname=S[1]; startf=S[3]; endf=S[4];
+       side=S[2]; audioname=S[3]; startf=S[5]; endf=S[6];
        print segment " " audioname "-" side " " startf/100 " " endf/100
 }' < $dir/text > $dir/segments
 sed -e 's?.*/??' -e 's?.sph??' $dir/sph.flist | paste - $dir/sph.flist \
@@ -140,7 +149,7 @@ awk '{print $1}' $dir/wav.scp \
                print "$1-$2 $1 $2\n"; ' \
   > $dir/reco2file_and_channel || exit 1;
 
-awk '{spk=substr($1,4,6); print $1 " " spk}' $dir/segments > $dir/utt2spk \
+awk '{spk=substr($1,1,6); print $1 " " spk}' $dir/segments > $dir/utt2spk \
   || exit 1;
 sort -k 2 $dir/utt2spk | utils/utt2spk_to_spk2utt.pl > $dir/spk2utt || exit 1;
 
