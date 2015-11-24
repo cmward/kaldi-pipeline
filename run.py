@@ -5,6 +5,7 @@ import os
 from os.path import abspath, basename
 from os.path import join as pjoin
 from subprocess import call
+from signal import signal, SIGPIPE, SIG_DFL
 from scripts.path import *
 
 """
@@ -60,17 +61,20 @@ def main(data_dir):
     call(train_args, shell=True)
 
     # format the LM
-    format_args = "utils/format_lm.sh {} {}/sw1.o3g.kn.gz {}/lexicon.txt {}".format(LANG, LM, LCL_DICT, FORMAT_LM)
-    call(format_args, shell=True)
+    format_args = "{} {} {} {} {}".format(
+            pjoin(UTILS, 'format_lm.sh'), LANG, pjoin(LM, 'sw1.o3g.kn.gz'),
+            pjoin(LCL_DICT, 'lexicon.txt'), FORMAT_LM)
+    call(format_args, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "MFCC TRAIN"
     # mfcc extraction
-    mfcc_train = "steps/make_mfcc.sh --nj 3 {} {} mfcc".format(TRAIN, MFCC_TRAIN)
+    mfcc_train = "steps/make_mfcc.sh --nj 3 {} {} {}".format(
+                    TRAIN, MFCC_TRAIN, pjoin(PROJECT_ROOT, 'mfcc'))
     call(mfcc_train, shell=True)
 
     print "CMVN TRAIN"
-    cmvn_train = "steps/compute_cmvn_stats.sh {} {} mfcc".format(
-                    TRAIN, MFCC_TRAIN)
+    cmvn_train = "steps/compute_cmvn_stats.sh {} {} {}".format(
+                    TRAIN, MFCC_TRAIN, pjoin(PROJECT_ROOT, 'mfcc'))
     call(cmvn_train, shell=True)
 
     print "FIX TRAIN"
@@ -80,16 +84,19 @@ def main(data_dir):
 
     print "AUDIO TRAIN"
     # monophone training
-    audio_train = ("steps/train_mono.sh --nj 3 --cmd utils/run.pl --totgauss 750 {} {} {}").format(TRAIN, LANG, MONO)
+    audio_train = ("steps/train_mono.sh --nj 3 --cmd utils/run.pl " +
+                   "--totgauss 750 {} {} {}").format(TRAIN, LANG, MONO)
     call(audio_train, shell=True)
 
     print "MFCC TEST"
     # repeat for test data
-    mfcc_test = "steps/make_mfcc.sh --nj 3 {} {} mfcc".format(TEST, MFCC_TEST)
+    mfcc_test = "steps/make_mfcc.sh --nj 3 {} {} {}".format(
+                     TEST, MFCC_TEST, pjoin(PROJECT_ROOT, 'mfcc'))
     call(mfcc_test, shell=True)
 
     print "CMVN TEST"
-    cmvn_test = "steps/compute_cmvn_stats.sh {} {} mfcc".format(TEST, MFCC_TEST)
+    cmvn_test = "steps/compute_cmvn_stats.sh {} {} {}".format(
+                    TEST, MFCC_TEST, pjoin(PROJECT_ROOT, 'mfcc'))
     call(cmvn_test, shell=True)
 
     print "FIX TEST"
