@@ -54,5 +54,61 @@ def main(data_dir):
                     LCL_DICT, LCL_LANG, LANG)
     call(util_arg, shell=True)
 
+    # train the LM
+    train_args="./swbd1_train_lms.sh {} {} {}".format(
+                    pjoin(TRAIN,'text'), pjoin(LCL_DICT,'lexicon.txt'), LM)
+    call(train_args, shell=True)
+
+    # format the LM
+    format_args = "utils/format_lm.sh {} {}/sw1.o3g.kn.gz {}/lexicon.txt {}".format(LANG, LM, LCL_DICT, FORMAT_LM)
+    call(format_args, shell=True)
+
+    print "MFCC TRAIN"
+    # mfcc extraction
+    mfcc_train = "steps/make_mfcc.sh --nj 3 {} {} mfcc".format(TRAIN, MFCC_TRAIN)
+    call(mfcc_train, shell=True)
+
+    print "CMVN TRAIN"
+    cmvn_train = "steps/compute_cmvn_stats.sh {} {} mfcc".format(
+                    TRAIN, MFCC_TRAIN)
+    call(cmvn_train, shell=True)
+
+    print "FIX TRAIN"
+    # clean up data 
+    fix_train = "utils/fix_data_dir.sh {}".format(TRAIN)
+    call(fix_train, shell=True)
+
+    print "AUDIO TRAIN"
+    # monophone training
+    audio_train = ("steps/train_mono.sh --nj 3 --cmd utils/run.pl --totgauss 750 {} {} {}").format(TRAIN, LANG, MONO)
+    call(audio_train, shell=True)
+
+    print "MFCC TEST"
+    # repeat for test data
+    mfcc_test = "steps/make_mfcc.sh --nj 3 {} {} mfcc".format(TEST, MFCC_TEST)
+    call(mfcc_test, shell=True)
+
+    print "CMVN TEST"
+    cmvn_test = "steps/compute_cmvn_stats.sh {} {} mfcc".format(TEST, MFCC_TEST)
+    call(cmvn_test, shell=True)
+
+    print "FIX TEST"
+    fix_test = "utils/fix_data_dir.sh {}".format(TEST)
+    call(fix_test, shell=True)
+
+    print "MKGRAPH"
+    mkgraph = "utils/mkgraph.sh --mono {} {} {}".format(FORMAT_LM, MONO, GRAPH)
+    call(mkgraph, shell=True)
+
+    print "DECODE"
+    # decode and get WER on test set
+    decode = "steps/decode.sh --nj 3 --cmd utils/run.pl {} {} {}".format(
+                GRAPH, TEST, DECODE_TE)
+    call(decode, shell=True)
+
+    print "WER"
+    wer = "for x in {}/wer*; do echo $x; grep WER $x done".format(DECODE_TE)
+    call(wer, shell=True)
+
 if __name__ == "__main__":
     main(sys.argv[1])
