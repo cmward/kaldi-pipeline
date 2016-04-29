@@ -70,52 +70,52 @@ def main(data_dir):
     # mfcc extraction
     mfcc_train = "steps/make_mfcc.sh --nj 3 {} {} {}".format(
                     TRAIN, MFCC_TRAIN, pjoin(PROJECT_ROOT, 'mfcc'))
-    call(mfcc_train, shell=True)
+    call(mfcc_train, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL)) 
 
     print "CMVN TRAIN"
     cmvn_train = "steps/compute_cmvn_stats.sh {} {} {}".format(
                     TRAIN, MFCC_TRAIN, pjoin(PROJECT_ROOT, 'mfcc'))
-    call(cmvn_train, shell=True)
+    call(cmvn_train, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "FIX TRAIN"
     # clean up data 
     fix_train = "utils/fix_data_dir.sh {}".format(TRAIN)
-    call(fix_train, shell=True)
+    call(fix_train, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "AUDIO TRAIN"
     # monophone training
     audio_train = ("steps/train_mono.sh --nj 3 --cmd utils/run.pl " +
                    "--totgauss 750 {} {} {}").format(TRAIN, LANG, MONO)
-    call(audio_train, shell=True)
+    call(audio_train, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "MFCC TEST"
     # repeat for test data
     mfcc_test = "steps/make_mfcc.sh --nj 3 {} {} {}".format(
                      TEST, MFCC_TEST, pjoin(PROJECT_ROOT, 'mfcc'))
-    call(mfcc_test, shell=True)
+    call(mfcc_test, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "CMVN TEST"
     cmvn_test = "steps/compute_cmvn_stats.sh {} {} {}".format(
                     TEST, MFCC_TEST, pjoin(PROJECT_ROOT, 'mfcc'))
-    call(cmvn_test, shell=True)
+    call(cmvn_test, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "FIX TEST"
     fix_test = "utils/fix_data_dir.sh {}".format(TEST)
-    call(fix_test, shell=True)
+    call(fix_test, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "MKGRAPH"
     mkgraph = "utils/mkgraph.sh --mono {} {} {}".format(FORMAT_LM, MONO, GRAPH)
-    call(mkgraph, shell=True)
+    call(mkgraph, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "DECODE"
     # decode and get WER on test set
     decode = "steps/decode.sh --nj 3 --cmd utils/run.pl {} {} {}".format(
                 GRAPH, TEST, DECODE_TE)
-    call(decode, shell=True)
+    call(decode, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
     print "WER"
-    wer = "for x in {}/wer*; do echo $x; grep WER $x done".format(DECODE_TE)
-    call(wer, shell=True)
+    wer = "for x in {}/wer*; do echo $x; grep WER $x done;".format(DECODE_TE)
+    call(wer, shell=True, preexec_fn = lambda: signal(SIGPIPE, SIG_DFL))
 
 if __name__ == "__main__":
     main(sys.argv[1])
